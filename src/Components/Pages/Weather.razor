@@ -1,0 +1,60 @@
+﻿@page "/"
+@implements IDisposable
+
+<PageTitle>Wetterdaten</PageTitle>
+
+<div class="row mb-4">
+    <div class="col">
+        <div class="card bg-light shadow">
+            <div class="card-body">
+                 <h4>Wetter Daten</h4>
+                <div class="row">
+                    <div class="col">
+                        @if (ChartData is not null && ChartData.Count > 0)
+                        {
+                            <!-- Chartconfig-Component -->
+                            <CascadingValue Name="ChartData" Value="ChartData">
+                                <CascadingValue Name="Dates" Value="Dates">
+                                <LineChart @key="ChartData" />
+                            </CascadingValue>
+                            </CascadingValue>
+
+                        }
+                        else
+                        {
+                            <div><i class="bi bi-database-fill-x"></i> No data found</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Timer? Timer;
+    private List<int> ChartData { get; set; } = new();
+    private List<string> Dates { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        // Initialize the timer to update chart data every 3 seconds
+        Timer = new(
+            e =>
+            {
+                InvokeAsync(() =>
+                {
+                    // Generate random data for the chart
+                    ChartData = Enumerable.Range(1, 10).Select(_ => Random.Shared.Next(10, 100)).ToList();
+                    Dates = Enumerable.Range(0, 10).Select(i => string.Format("{0:dd.MM.yy}", DateTime.Today.AddDays(i))).ToList();
+                    //Force Chartcomponent to reload
+                    StateHasChanged();
+                });
+            },
+            null,
+            TimeSpan.Zero,
+            TimeSpan.FromSeconds(3)
+        );
+    }
+    public void Dispose() => Timer?.Dispose();
+}

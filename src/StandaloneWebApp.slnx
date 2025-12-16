@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="StandaloneWebApp.csproj">
+    <Deploy />
+  </Project>
+</Solution>
