@@ -22,7 +22,8 @@
                         }
                         else
                         {
-                            <div><i class="bi bi-database-fill-x"></i> No data found</div>
+                            <span class="spinner-border text-success" role="status"></span>
+                            <span class="text-success ms-2">Lade Wetterdaten...</span>
                         }
                     </div>
                 </div>
@@ -32,29 +33,32 @@
 </div>
 
 @code {
-    private Timer? Timer;
     private List<int> ChartData { get; set; } = new();
     private List<string> Dates { get; set; } = new();
+    private PeriodicTimer? Timer;
+    private CancellationTokenSource Cts = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Initialize the timer to update chart data every 3 seconds
-        Timer = new(
-            e =>
-            {
-                InvokeAsync(() =>
-                {
-                    // Generate random data for the chart
-                    ChartData = Enumerable.Range(1, 10).Select(_ => Random.Shared.Next(10, 100)).ToList();
-                    Dates = Enumerable.Range(0, 10).Select(i => string.Format("{0:dd.MM.yy}", DateTime.Today.AddDays(i))).ToList();
-                    //Force Chartcomponent to reload
-                    StateHasChanged();
-                });
-            },
-            null,
-            TimeSpan.Zero,
-            TimeSpan.FromSeconds(3)
-        );
+        Timer = new PeriodicTimer(TimeSpan.FromSeconds(3));
+
+        while (await Timer.WaitForNextTickAsync(Cts.Token))
+        {
+            ChartData = Enumerable.Range(1, 10)
+                .Select(_ => Random.Shared.Next(10, 100))
+                .ToList();
+
+            Dates = Enumerable.Range(0, 10)
+                .Select(i => DateTime.Today.AddDays(i).ToString("dd.MM.yy"))
+                .ToList();
+
+            await InvokeAsync(StateHasChanged);
+        }
     }
-    public void Dispose() => Timer?.Dispose();
+
+    public void Dispose()
+    {
+        Cts.Cancel();
+        Timer?.Dispose();
+    }
 }
