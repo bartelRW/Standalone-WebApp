@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-
-    <PropertyGroup>
+	<PropertyGroup>
         <TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
 
@@ -14,6 +13,7 @@
         <OutputType>Exe</OutputType>
         <RootNamespace>StandaloneWebApp</RootNamespace>
         <UseMaui>true</UseMaui>
+		<UseMonoRuntime>false</UseMonoRuntime>
         <SingleProject>true</SingleProject>
         <ImplicitUsings>enable</ImplicitUsings>
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
@@ -30,14 +30,30 @@
         <ApplicationVersion>1</ApplicationVersion>
 
         <!-- To develop, package, and publish an app to the Microsoft Store, see: https://aka.ms/MauiTemplateUnpackaged -->
-        <WindowsPackageType>None</WindowsPackageType>
+		<WindowsPackageType>MSIX</WindowsPackageType>
+		<!-- WindowsPackageType Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">None</WindowsPackageType -->
 
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">15.0</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+        <Title></Title>
+        <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <AppInstallerUri>C:\_Projekte\Blazor\Standalone-WebApp</AppInstallerUri>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <PackageCertificateThumbprint>D2CE85A3B06399649B1D5303464FB48035629570</PackageCertificateThumbprint>
     </PropertyGroup>
+
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(Configuration)' == 'Release'">
+		<AppxPackageSigningEnabled>true</AppxPackageSigningEnabled>
+		<PackageCertificateThumbprint>B09E52CCCC52C6BB9831A20E489F25E7A77E7988</PackageCertificateThumbprint>
+	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(RuntimeIdentifierOverride)' != ''">
+		<RuntimeIdentifier>$(RuntimeIdentifierOverride)</RuntimeIdentifier>
+	</PropertyGroup>
 
     <ItemGroup>
         <!-- App Icon -->

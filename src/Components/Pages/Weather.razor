@@ -52,7 +52,7 @@
                 .Select(i => DateTime.Today.AddDays(i).ToString("dd.MM.yy"))
                 .ToList();
 
-            await InvokeAsync(StateHasChanged);
+            StateHasChanged();
         }
     }
 
